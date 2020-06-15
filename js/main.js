@@ -99,7 +99,7 @@ var russificationTypes = function (obj) {
   return currentType;
 };
 
-// Функция заполняет элементы списка текстом или давбляет в src путь к картинкам и удаляет пустые
+// Функция заполняет элементы списка текстом или давбляет в src путь к картинкам
 var createListElement = function (mass, parentElement, SelectorElements, image) {
   if (!image) {
     mass.forEach(function (item) {
@@ -128,22 +128,10 @@ var createListElement = function (mass, parentElement, SelectorElements, image) 
   return parentElement;
 };
 
-// Функция возвращает элемент только с уникальными значениями
-var uniqueElementsMass = function (arr) {
-
-  for (var l = 0; l < arr.length; l++) {
-
-    for (var z = l + 1; z < arr.length; z++) {
-      if (arr[l] === arr[z]) {
-        delete arr[z];
-      }
-    }
-  }
-
-  return arr.filter(function (e) {
-    return e !== null;
-  });
-};
+// Функция возвращает массив только с уникальными значениями
+function uniqueElementsMass(value, index, arr) {
+  return arr.indexOf(value) === index;
+}
 
 // Функция возвращает массив  с радомными элементами
 var randomGenerateSomeElement = function (mass) {
@@ -154,7 +142,7 @@ var randomGenerateSomeElement = function (mass) {
     newMass.push(mass[randomGenerate(0, mass.length)]);
   }
 
-  return uniqueElementsMass(newMass);
+  return newMass.filter(uniqueElementsMass);
 };
 
 // функция возращает рандомное число в определенном интервале
@@ -226,7 +214,7 @@ var addAds = function () {
     fragmentCard.appendChild(elemCard);
   }
 
-  mapPins.appendChild(fragmentLabel);// добавляем метки объявлений на карту
+  mapPins.appendChild(fragmentLabel); // добавляем метки объявлений на карту
   map.insertBefore(fragmentCard, mapContainer); // добавляем объявления на страницу
 };
 
