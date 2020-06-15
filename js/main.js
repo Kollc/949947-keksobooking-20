@@ -135,10 +135,10 @@ function uniqueElementsMass(value, index, arr) {
 
 // Функция возвращает массив  с радомными элементами
 var randomGenerateSomeElement = function (mass) {
-  var j = randomGenerate(0, mass.length); // перменная кол-ва элементов
+  var countElements = randomGenerate(0, mass.length);
   var newMass = [];
 
-  for (var i = 0; i <= j; i++) {
+  for (var i = 0; i <= countElements; i++) {
     newMass.push(mass[randomGenerate(0, mass.length)]);
   }
 
