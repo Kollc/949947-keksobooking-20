@@ -1,8 +1,27 @@
 'use strict';
 
 var TOTAL_ADS = 8;
-var HEIGHT_ADS = 70;
-var WIDTH_ADS = 50;
+var HEIGHT_MARK = 70;
+var WIDTH_MARK = 50; // примерные значения обычных меток
+
+var HEIGHT_MAIN_MARK = 85; // примерные значения главной метки
+var WIDTH_MAIN_MARK = 65;
+
+var MAX_COUNT_ROOMS = 100;
+var MIN_COUNT_GUESTS = 0;
+
+var mapPins = document.querySelector('.map__pins'); // блок с картой, куда нужно добавить объявления
+var mapContainer = document.querySelector('.map__filters-container');
+var map = document.querySelector('.map');
+var pinMain = document.querySelector('.map__pin--main');
+var adForm = document.querySelector('.ad-form');
+var addressInput = document.querySelector('#address');
+var roomNumber = document.querySelector('#room_number');
+var guestNumber = document.querySelector('#capacity');
+var wrappersElementsForm = document.querySelectorAll('.ad-form__element');
+
+document.querySelectorAll('fieldset').disabled = true; // делаем элеметы формы не активными
+document.querySelectorAll('map__filters').disabled = true; // делаем элеметы формы не активными
 
 // данные объявлений
 var OPTIONS = {
@@ -178,16 +197,41 @@ var createAdsObj = function (i) {
   return adsObj;
 };
 
+// функция проверят соответствие кол-ва комнат и кол-ва гостей (в данном случае)
+var validationMatching = function (ElementRooms, ElementGuests) {
+  var roomsValue = parseInt(ElementRooms.value, 10);
+  var guestsValue = parseInt(ElementGuests.value, 10);
+
+  if (roomsValue < guestsValue) {
+    ElementRooms.setCustomValidity('Нужно на ' + (guestsValue - roomsValue) + ' комнаты больше или взять меньше гостей');
+  } else {
+    if ((roomsValue === MAX_COUNT_ROOMS && guestsValue !== MIN_COUNT_GUESTS) || (roomsValue !== MAX_COUNT_ROOMS && guestsValue === MIN_COUNT_GUESTS)) {
+      ElementRooms.setCustomValidity('100 комнат подойдут только не для гостей');
+    } else {
+      ElementRooms.setCustomValidity('');
+      ElementGuests.setCustomValidity('');
+    }
+  }
+};
+
+// функция , которая разблокировывает страницу
+var unlockPage = function (mapElem, adFormElem) {
+  mapElem.classList.remove('map--faded');
+  adFormElem.classList.remove('ad-form--disabled');
+  document.querySelectorAll('fieldset').disabled = false; // делаем элеметы формы активными
+  document.querySelectorAll('map__filters').disabled = false; // делаем элеметы формы активными
+};
+
+// функция, которая добавляет координаты главной точки в поле адреса
+var addCoordinatesAddress = function (inputField, x, y) {
+  inputField.value = (x - Math.floor(WIDTH_MAIN_MARK / 2)) + ', ' + (y - Math.floor(HEIGHT_MAIN_MARK / 2));
+};
+
 // Функция добавляет метки объявлений в DOM
 var addAds = function () {
 
   var fragmentLabel = document.createDocumentFragment();
   var fragmentCard = document.createDocumentFragment();
-
-  var mapPins = document.querySelector('.map__pins'); // блок с картой, куда нужно добавить объявления
-  var mapContainer = document.querySelector('.map__filters-container');
-  var map = document.querySelector('.map');
-  map.classList.remove('map--faded'); // делаем карту активной
 
   var templateLabel = document.querySelector('#pin').content.querySelector('.map__pin'); // получаем шаблон метки из верстки
   var templateCard = document.querySelector('#card').content.querySelector('.map__card'); // получаем шаблон каточки объяевления из верстки
@@ -196,8 +240,8 @@ var addAds = function () {
     var elemLabel = templateLabel.cloneNode(true);
     elemLabel.querySelector('img').src = createAdsObj(i).author.avatar;
     elemLabel.querySelector('img').alt = createAdsObj(i).offer.title;
-    elemLabel.style.left = (createAdsObj(i).location.x - WIDTH_ADS / 2) + 'px'; // устанавливаем координаты метки с учетом ее размеров
-    elemLabel.style.top = (createAdsObj(i).location.y - HEIGHT_ADS) + 'px'; // устанавливаем координаты метки с учетом ее размеров
+    elemLabel.style.left = (createAdsObj(i).location.x - WIDTH_MARK / 2) + 'px'; // устанавливаем координаты метки с учетом ее размеров
+    elemLabel.style.top = (createAdsObj(i).location.y - HEIGHT_MARK) + 'px'; // устанавливаем координаты метки с учетом ее размеров
     fragmentLabel.appendChild(elemLabel);
 
     var elemCard = templateCard.cloneNode(true);
@@ -219,3 +263,30 @@ var addAds = function () {
 };
 
 addAds();
+
+// Ещё один момент заключается в том, что поле адреса должно быть заполнено всегда, в том числе сразу после открытия страницы.
+addCoordinatesAddress(addressInput, pinMain.style.left.replace('px', ''), pinMain.style.top.replace('px', '')); // вызов метода, который устанавливает значения поля ввода адреса
+
+pinMain.addEventListener('mousedown', function (evt) {
+  if (evt.button === 0) {
+    unlockPage(map, adForm);
+    addCoordinatesAddress(addressInput, pinMain.style.left.replace('px', ''), pinMain.style.top.replace('px', '')); // вызов метода, который устанавливает значения поля ввода адреса
+  }
+});
+
+// разблокирование страницы нажатием на Enter
+pinMain.addEventListener('keydown', function (evt) {
+  if (evt.key === 'Enter') {
+    unlockPage(map, adForm);
+  }
+});
+
+validationMatching(roomNumber, guestNumber); // чтобы пользователь не мог отправить неправильную форму , как только страниа загрузилась
+
+wrappersElementsForm.forEach(function (formElement) { //  перебираем все fieldset в форме
+  formElement.addEventListener('input', function (evt) {
+    if (evt.target === roomNumber || evt.target === guestNumber) {
+      validationMatching(roomNumber, guestNumber); //  Функция валидации сопоставление кол-ва гостей и комнат
+    }
+  });
+});
