@@ -420,6 +420,8 @@ wrappersElementsForm.forEach(function (formElement) { //  перебираем �
 
       if (priceAd.value < minPrice) {
         priceAd.setCustomValidity('Минимальная сумма ' + minPrice);
+      } else if (priceAd.value > MAX_PRICE) {
+        priceAd.setCustomValidity('Максимальная сумма ' + MAX_PRICE);
       } else {
         priceAd.setCustomValidity('');
       }
