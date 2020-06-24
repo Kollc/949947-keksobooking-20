@@ -10,6 +10,11 @@ var WIDTH_MAIN_MARK = 65;
 var MAX_COUNT_ROOMS = 100;
 var MIN_COUNT_GUESTS = 0;
 
+var MAX_SIMBOLS = 100;
+var MIN_SIMBOLS = 30;
+
+var MAX_PRICE = 1000000;
+
 var mapPins = document.querySelector('.map__pins'); // блок с картой, куда нужно добавить объявления
 var mapContainer = document.querySelector('.map__filters-container');
 var map = document.querySelector('.map');
@@ -19,6 +24,13 @@ var addressInput = document.querySelector('#address');
 var roomNumber = document.querySelector('#room_number');
 var guestNumber = document.querySelector('#capacity');
 var wrappersElementsForm = document.querySelectorAll('.ad-form__element');
+var titleAd = document.querySelector('#title');
+var priceAd = document.querySelector('#price');
+var typeAd = document.querySelector('#type');
+var timeIn = document.querySelector('#timein');
+var timeOut = document.querySelector('#timeout');
+var imagesAd = document.querySelector('#images');
+var avatarAd = document.querySelector('#avatar');
 
 document.querySelectorAll('fieldset').disabled = true; // делаем элеметы формы не активными
 document.querySelectorAll('map__filters').disabled = true; // делаем элеметы формы не активными
@@ -46,17 +58,33 @@ var OPTIONS = {
     'Красивые соседки'
   ],
   TYPES: [{
-    palace: 'Дворец'
+    palace: {
+      name: 'Дворец',
+      enName: 'palace',
+      minPrice: 10000
+    }
   },
   {
-    flat: 'Квартира'
+    house: {
+      name: 'Дом',
+      enName: 'house',
+      minPrice: 5000
+    }
   },
   {
-    house: 'Дом'
+    flat: {
+      name: 'Квартира',
+      enName: 'flat',
+      minPrice: 1000
+    }
   },
   {
-    bungalo: 'Бунгало'
-  }
+    bungalo: {
+      name: 'Бунгало',
+      enName: 'bungalo',
+      minPrice: 0
+    }
+  },
   ],
   CHECKINS: [
     '12:00',
@@ -198,12 +226,12 @@ var createAdsObj = function (i) {
 };
 
 // функция проверят соответствие кол-ва комнат и кол-ва гостей (в данном случае)
-var validationMatching = function (ElementRooms, ElementGuests) {
+var validationMatchingRooms = function (ElementRooms, ElementGuests) {
   var roomsValue = parseInt(ElementRooms.value, 10);
   var guestsValue = parseInt(ElementGuests.value, 10);
 
   if (roomsValue < guestsValue) {
-    ElementRooms.setCustomValidity('Нужно на ' + (guestsValue - roomsValue) + ' комнаты больше или взять меньше гостей');
+    ElementRooms.setCustomValidity('Нужно больше комнат или взять меньше гостей');
   } else {
     if ((roomsValue === MAX_COUNT_ROOMS && guestsValue !== MIN_COUNT_GUESTS) || (roomsValue !== MAX_COUNT_ROOMS && guestsValue === MIN_COUNT_GUESTS)) {
       ElementRooms.setCustomValidity('100 комнат подойдут только не для гостей');
@@ -212,6 +240,34 @@ var validationMatching = function (ElementRooms, ElementGuests) {
       ElementGuests.setCustomValidity('');
     }
   }
+};
+
+// функция проверят соответствие типа жилья и цены за ночь (в данном случае)
+var validationMatchingType = function (typeValue) {
+  var priceNight = 0;
+
+  switch (typeValue) {
+    case OPTIONS.TYPES[0].palace.enName:
+      priceNight = OPTIONS.TYPES[0].palace.minPrice;
+      break;
+
+    case OPTIONS.TYPES[1].house.enName:
+      priceNight = OPTIONS.TYPES[1].house.minPrice;
+      break;
+
+    case OPTIONS.TYPES[2].flat.enName:
+      priceNight = OPTIONS.TYPES[2].flat.minPrice;
+      break;
+
+    case OPTIONS.TYPES[3].bungalo.enName:
+      priceNight = OPTIONS.TYPES[3].bungalo.minPrice;
+      break;
+
+    default:
+      break;
+  }
+
+  return priceNight;
 };
 
 // функция , которая разблокировывает страницу
@@ -249,12 +305,13 @@ var addAds = function () {
     elemCard.querySelector('.popup__title').textContent = createAdsObj(i).offer.title;
     elemCard.querySelector('.popup__text--address').textContent = createAdsObj(i).offer.address;
     elemCard.querySelector('.popup__text--price').textContent = createAdsObj(i).offer.price + '₽/ночь';
-    elemCard.querySelector('.popup__type').textContent = russificationTypes(createAdsObj(i).offer.type);
+    elemCard.querySelector('.popup__type').textContent = russificationTypes(createAdsObj(i).offer.type).name;
     elemCard.querySelector('.popup__text--capacity').textContent = createAdsObj(i).offer.rooms + ' комнаты для ' + createAdsObj(i).offer.guests + ' гостей';
     elemCard.querySelector('.popup__text--time').textContent = 'Заезд после ' + createAdsObj(i).offer.checkin + ', выезд до ' + createAdsObj(i).offer.checkout;
     elemCard.appendChild(createListElement(createAdsObj(i).offer.features, elemCard.querySelector('.popup__features'), '.popup__feature', false));
     elemCard.querySelector('.popup__description').textContent = createAdsObj(i).offer.description;
     elemCard.appendChild(createListElement(createAdsObj(i).offer.photos, elemCard.querySelector('.popup__photos'), '.popup__photo', true));
+    elemCard.style.display = 'none'; // скрываем все карточки на странице
     fragmentCard.appendChild(elemCard);
   }
 
@@ -266,7 +323,7 @@ addAds();
 
 // Ещё один момент заключается в том, что поле адреса должно быть заполнено всегда, в том числе сразу после открытия страницы.
 addCoordinatesAddress(addressInput, pinMain.style.left.replace('px', ''), pinMain.style.top.replace('px', '')); // вызов метода, который устанавливает значения поля ввода адреса
-
+addressInput.setAttribute('readonly', 'true'); // добавлет к полю адрес возможность только чтения
 pinMain.addEventListener('mousedown', function (evt) {
   if (evt.button === 0) {
     unlockPage(map, adForm);
@@ -281,12 +338,109 @@ pinMain.addEventListener('keydown', function (evt) {
   }
 });
 
-validationMatching(roomNumber, guestNumber); // чтобы пользователь не мог отправить неправильную форму , как только страниа загрузилась
+validationMatchingRooms(roomNumber, guestNumber); // чтобы пользователь не мог отправить неправильную форму , как только страниа загрузилась
 
 wrappersElementsForm.forEach(function (formElement) { //  перебираем все fieldset в форме
   formElement.addEventListener('input', function (evt) {
     if (evt.target === roomNumber || evt.target === guestNumber) {
-      validationMatching(roomNumber, guestNumber); //  Функция валидации сопоставление кол-ва гостей и комнат
+      validationMatchingRooms(roomNumber, guestNumber); //  Функция валидации сопоставление кол-ва гостей и комнат
     }
   });
 });
+
+// при клике (или нажатии Enter) на метку появляется характеристика объявления
+var allCards = map.querySelectorAll('.map__card'); // получаем все карточки
+var allPins = mapPins.querySelectorAll('button:not(.map__pin--main)'); // получаем все метки на карте
+
+allPins.forEach(function (pin, indexPin) {
+  pin.addEventListener('click', function (evt) {
+    allCards.forEach(function (card) {
+      card.style.display = 'none';
+    });
+
+    allCards[indexPin].style.display = 'block';
+
+    var closeCard = allCards[indexPin].querySelector('.popup__close'); // получаем триггер закрытия
+
+    closeCard.addEventListener('click', function () { // закрытие объявления по клику
+      allCards[indexPin].style.display = 'none';
+    });
+
+    document.addEventListener('keydown', function () { // закрытие объявления на клавишу Esc
+      if (evt.key === 'Escape') {
+        allCards[indexPin].style.display = 'none';
+      }
+    });
+  });
+
+  pin.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      allCards.forEach(function (card) {
+        card.style.display = 'none';
+      });
+
+      allCards[indexPin].style.display = 'block';
+    }
+
+    var closeCard = allCards[indexPin].querySelector('.popup__close'); // получаем триггер закрытия
+
+    closeCard.addEventListener('click', function () { // закрытие объявления по клику
+      allCards[indexPin].style.display = 'none';
+    });
+
+    document.addEventListener('keydown', function () { // закрытие объявления на клавишу Esc
+      if (evt.key === 'Escape') {
+        allCards[indexPin].style.display = 'none';
+      }
+    });
+  });
+});
+
+// валидация поля "Заголовок объявления"
+titleAd.addEventListener('input', function () {
+  var titleLenght = titleAd.value.length;
+
+  if (titleLenght > MAX_SIMBOLS) {
+    titleAd.setCustomValidity('Удалите лишние ' + (titleLenght - MAX_SIMBOLS) + ' символов');
+  } else if (titleLenght < MIN_SIMBOLS) {
+    titleAd.setCustomValidity('Еще ' + (MIN_SIMBOLS - titleLenght) + ' символов');
+  } else {
+    titleAd.setCustomValidity('');
+  }
+});
+
+// валидация сопоставления типа жилья и цены за ночь
+priceAd.placeholder = validationMatchingType(typeAd.value); // изменял placeholder сразу после загрузки страницы(тк в поле тип жилья изначально стоит "Квартира")
+
+wrappersElementsForm.forEach(function (formElement) { //  перебираем все fieldset в форме
+  formElement.addEventListener('input', function (evt) {
+    if (evt.target === priceAd || evt.target === typeAd) {
+      var minPrice = validationMatchingType(typeAd.value);
+      priceAd.placeholder = minPrice;
+
+      if (priceAd.value < minPrice) {
+        priceAd.setCustomValidity('Минимальная сумма ' + minPrice);
+      } else {
+        priceAd.setCustomValidity('');
+      }
+    }
+  });
+});
+
+
+// валидация сопоставления времени заезда и выезда
+priceAd.placeholder = validationMatchingType(typeAd.value); // изменял placeholder сразу после загрузки страницы(тк в поле тип жилья изначально стоит "Квартира")
+
+wrappersElementsForm.forEach(function (formElement) { //  перебираем все fieldset в форме
+  formElement.addEventListener('input', function (evt) {
+    if (evt.target === timeIn) {
+      timeOut.value = evt.target.value;
+    } else if (evt.target === timeOut) {
+      timeIn.value = evt.target.value;
+    }
+  });
+});
+
+// Значением полей «Ваша фотография» и «Фотография жилья» может быть только изображение.
+imagesAd.setAttribute('accept', 'image/jpg, image/jpeg');
+avatarAd.setAttribute('accept', 'image/jpg, image/jpeg');
