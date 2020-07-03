@@ -24,33 +24,25 @@
       'Красивые соседки'
     ],
     TYPES: [{
-      palace: {
-        name: 'Дворец',
-        enName: 'palace',
-        minPrice: 10000
-      }
+      name: 'Дворец',
+      enName: 'palace',
+      minPrice: 10000
     },
     {
-      house: {
-        name: 'Дом',
-        enName: 'house',
-        minPrice: 5000
-      }
+      name: 'Дом',
+      enName: 'house',
+      minPrice: 5000
     },
     {
-      flat: {
-        name: 'Квартира',
-        enName: 'flat',
-        minPrice: 1000
-      }
+      name: 'Квартира',
+      enName: 'flat',
+      minPrice: 1000
     },
     {
-      bungalo: {
-        name: 'Бунгало',
-        enName: 'bungalo',
-        minPrice: 0
-      }
-    },
+      name: 'Бунгало',
+      enName: 'bungalo',
+      minPrice: 0
+    }
     ],
     CHECKINS: [
       '12:00',

@@ -19,24 +19,12 @@
   var timeOut = document.querySelector('#timeout');
   var imagesAd = document.querySelector('#images');
   var avatarAd = document.querySelector('#avatar');
-  var pinMain = document.querySelector('.map__pin--main');
-  var adForm = document.querySelector('.ad-form');
   var addressInput = document.querySelector('#address');
-  var map = document.querySelector('.map');
 
   document.querySelectorAll('fieldset').disabled = true; // делаем элеметы формы не активными
   document.querySelectorAll('map__filters').disabled = true; // делаем элеметы формы не активными
 
-
-  // Ещё один момент заключается в том, что поле адреса должно быть заполнено всегда, в том числе сразу после открытия страницы.
-  window.addCoordinatesAddress(addressInput, pinMain.style.left.replace('px', ''), pinMain.style.top.replace('px', '')); // вызов метода, который устанавливает значения поля ввода адреса
   addressInput.setAttribute('readonly', 'true'); // добавлет к полю адрес возможность только чтения
-  pinMain.addEventListener('mousedown', function (evt) {
-    if (evt.button === 0) {
-      window.unlockPage(map, adForm);
-      window.addCoordinatesAddress(addressInput, pinMain.style.left.replace('px', ''), pinMain.style.top.replace('px', '')); // вызов метода, который устанавливает значения поля ввода адреса
-    }
-  });
 
   // функция проверят соответствие кол-ва комнат и кол-ва гостей (в данном случае)
   var validationMatchingRooms = function (ElementRooms, ElementGuests) {
@@ -59,26 +47,11 @@
   var validationMatchingType = function (typeValue) {
     var priceNight = 0;
 
-    switch (typeValue) {
-      case window.OPTIONS.TYPES[0].palace.enName:
-        priceNight = window.OPTIONS.TYPES[0].palace.minPrice;
-        break;
-
-      case window.OPTIONS.TYPES[1].house.enName:
-        priceNight = window.OPTIONS.TYPES[1].house.minPrice;
-        break;
-
-      case window.OPTIONS.TYPES[2].flat.enName:
-        priceNight = window.OPTIONS.TYPES[2].flat.minPrice;
-        break;
-
-      case window.OPTIONS.TYPES[3].bungalo.enName:
-        priceNight = window.OPTIONS.TYPES[3].bungalo.minPrice;
-        break;
-
-      default:
-        break;
-    }
+    window.OPTIONS.TYPES.forEach(function (type) {
+      if (type.enName === typeValue) {
+        priceNight = type.minPrice;
+      }
+    });
 
     return priceNight;
   };
