@@ -2,15 +2,6 @@
 
 (function () {
 
-  var HEIGHT_MAIN_MARK = 85; // примерные значения главной метки
-  var WIDTH_MAIN_MARK = 65;
-
-  // функция, которая добавляет координаты главной точки в поле адреса
-  window.addCoordinatesAddress = function (inputField, x, y) {
-    inputField.value = (x - Math.floor(WIDTH_MAIN_MARK / 2)) + ', ' + (y - Math.floor(HEIGHT_MAIN_MARK / 2));
-  };
-
-
   // функция , которая разблокировывает страницу
   window.unlockPage = function (mapElem, adFormElem) {
     mapElem.classList.remove('map--faded');
@@ -33,9 +24,9 @@
   };
 
   // Функция заполняет элементы списка текстом или давбляет в src путь к картинкам
-  window.createListElement = function (mass, parentElement, SelectorElements, image) {
+  window.createListElement = function (elements, parentElement, SelectorElements, image) {
     if (!image) {
-      mass.forEach(function (item) {
+      elements.forEach(function (item) {
         var childElement = parentElement.querySelector(SelectorElements + '--' + item);
         childElement.textContent = item;
       });
@@ -47,7 +38,7 @@
         }
       });
     } else {
-      mass.forEach(function (item, index) {
+      elements.forEach(function (item, index) {
         var childElement = parentElement.querySelector(SelectorElements);
         if (index >= 1) {
           childElement = childElement.cloneNode(true);
@@ -62,24 +53,24 @@
   };
 
   // Функция возвращает массив только с уникальными значениями
-  function uniqueElementsMass(value, index, arr) {
+  function getUniqueElements(value, index, arr) {
     return arr.indexOf(value) === index;
   }
 
   // Функция возвращает массив  с радомными элементами
   window.randomGenerateSomeElement = function (mass) {
-    var countElements = window.randomGenerate(0, mass.length);
-    var newMass = [];
+    var countElements = window.getRandomInt(0, mass.length);
+    var result = [];
 
     for (var i = 0; i <= countElements; i++) {
-      newMass.push(mass[window.randomGenerate(0, mass.length)]);
+      result.push(mass[window.getRandomInt(0, mass.length)]);
     }
 
-    return newMass.filter(uniqueElementsMass);
+    return result.filter(getUniqueElements);
   };
 
   // функция возращает рандомное число в определенном интервале
-  window.randomGenerate = function (min, max) {
+  window.getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   };
 })();
