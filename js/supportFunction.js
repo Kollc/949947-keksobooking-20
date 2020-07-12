@@ -73,4 +73,21 @@
   window.getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   };
+
+  // функция выводит оишибки в DOM
+  window.getError = function (error) {
+    var main = document.querySelector('main');
+    var block = main.querySelector('.notice');
+
+    var div = document.createElement('div');
+    div.style.backgroundColor = '#fff';
+    var span = document.createElement('span');
+    span.style.color = 'red';
+    span.style.width = '100%';
+    span.style.display = 'block';
+    span.style.textAlign = 'center';
+    span.textContent = error;
+    div.appendChild(span);
+    main.insertBefore(div, block);
+  };
 })();

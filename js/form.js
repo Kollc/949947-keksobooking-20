@@ -56,7 +56,7 @@
     return priceNight;
   };
 
-  validationMatchingRooms(roomNumber, guestNumber); // чтобы пользователь не мог отправить неправильную форму , как только страниа загрузилась
+  validationMatchingRooms(roomNumber, guestNumber); // чтобы пользователь не мог отправить неправильную форму , как только страница загрузилась
 
   wrappersElementsForm.forEach(function (formElement) { //  перебираем все fieldset в форме
     formElement.addEventListener('input', function (evt) {
