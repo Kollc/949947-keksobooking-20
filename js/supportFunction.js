@@ -10,6 +10,14 @@
     document.querySelectorAll('map__filters').disabled = false; // делаем элеметы формы активными
   };
 
+  // функция , которая блокировывает страницу
+  window.lockPage = function (mapElem, adFormElem) {
+    mapElem.classList.add('map--faded');
+    adFormElem.classList.add('ad-form--disabled');
+    document.querySelectorAll('fieldset').disabled = true; // делаем элеметы формы неактивными
+    document.querySelectorAll('map__filters').disabled = true; // делаем элеметы формы неактивными
+  };
+
   // Функция проверяет соответстиве элемента в объекте массива и возвращает русифицированную версию (пришлось написать вот это, тк ассоциативные массивы только с ES6)
   window.russificationTypes = function (obj) {
     var types = ['palace', 'flat', 'house', 'bungalo'];
@@ -89,5 +97,51 @@
     span.textContent = error;
     div.appendChild(span);
     main.insertBefore(div, block);
+  };
+
+  // если форма отправилась успшено
+  window.onSuccess = function () {
+    var popupTemplate = document.querySelector('#success').content.querySelector('.success');
+    var main = document.querySelector('main');
+    var map = document.querySelector('.map');
+    var adForm = document.querySelector('.ad-form');
+    window.lockPage(map, adForm);
+    adForm.reset(); // сбрасываем форму
+
+    var popup = popupTemplate.cloneNode(true);
+    main.appendChild(popup);
+
+    popup.addEventListener('click', function (evt) {
+      if (evt.target.classList.contains('success') || evt.target.parentNode.classList.contains('success')) {
+        popup.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        popup.style.display = 'none';
+      }
+    });
+  };
+
+  // если при отправке формы возникли ошибки
+  window.onError = function () {
+    var popupTemplate = document.querySelector('#error ').content.querySelector('.error');
+    var main = document.querySelector('main');
+
+    var popup = popupTemplate.cloneNode(true);
+    main.appendChild(popup);
+
+    popup.addEventListener('click', function (evt) {
+      if (evt.target.classList.contains('error__button')) {
+        popup.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        popup.style.display = 'none';
+      }
+    });
   };
 })();

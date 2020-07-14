@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  // var TOTAL_ADS = 8;
   var HEIGHT_MARK = 70;
   var WIDTH_MARK = 50; // примерные значения обычных меток
 

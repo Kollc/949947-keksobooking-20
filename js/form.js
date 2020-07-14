@@ -9,6 +9,7 @@
 
   var MAX_PRICE = 1000000;
 
+  var form = document.querySelector('.ad-form');
   var roomNumber = document.querySelector('#room_number');
   var guestNumber = document.querySelector('#capacity');
   var wrappersElementsForm = document.querySelectorAll('.ad-form__element');
@@ -20,6 +21,7 @@
   var imagesAd = document.querySelector('#images');
   var avatarAd = document.querySelector('#avatar');
   var addressInput = document.querySelector('#address');
+  var formReset = document.querySelector('.ad-form__reset');
 
   document.querySelectorAll('fieldset').disabled = true; // делаем элеметы формы не активными
   document.querySelectorAll('map__filters').disabled = true; // делаем элеметы формы не активными
@@ -99,7 +101,6 @@
     });
   });
 
-
   // валидация сопоставления времени заезда и выезда
   priceAd.placeholder = validationMatchingType(typeAd.value); // изменял placeholder сразу после загрузки страницы(тк в поле тип жилья изначально стоит "Квартира")
 
@@ -113,8 +114,18 @@
     });
   });
 
+  // обработчик сбрасывает формы (хотя у кнопки и есть уже type='reset')
+  formReset.addEventListener('click', function () {
+    form.reset();
+  });
+
   // Значением полей «Ваша фотография» и «Фотография жилья» может быть только изображение.
   imagesAd.setAttribute('accept', 'image/jpg, image/jpeg');
   avatarAd.setAttribute('accept', 'image/jpg, image/jpeg');
 
+  form.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+
+    window.save(new FormData(form), window.onSuccess, window.onError); // отправляем данные на сервер
+  });
 })();
