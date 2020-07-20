@@ -27,7 +27,7 @@
     item.setAttribute('disabled', 'true');
   });
 
-  document.querySelectorAll('map__filters').forEach(function (item) { // делаем элеметы формы не активными
+  document.querySelectorAll('.map__filters').forEach(function (item) { // делаем элеметы формы не активными
     item.setAttribute('disabled', 'true');
   });
 
