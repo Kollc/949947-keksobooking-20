@@ -11,13 +11,11 @@
   var pinMain = document.querySelector('.map__pin--main');
   var addressInput = document.querySelector('#address');
 
+  window.lockPage(map, adForm);
+
   window.load(function (data) {
     window.addAds(data.length, data);
   }, window.getError); // в случае ошибки будте выводиться текст под картой (в ТЗ не нашел как правильно это обработать)
-
-  var map = document.querySelector('.map');
-  var adForm = document.querySelector('.ad-form');
-  window.lockPage(map, adForm);
 
   // Функция добавляет метки объявлений в DOM
   window.addAds = function (adsTotal, dataAds) {
