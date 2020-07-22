@@ -13,10 +13,6 @@
 
   window.lockPage(map, adForm);
 
-  window.load(function (data) {
-    window.addAds(data.length, data);
-  }, window.getError); // в случае ошибки будте выводиться текст под картой (в ТЗ не нашел как правильно это обработать)
-
   // Функция добавляет метки объявлений в DOM
   window.addAds = function (adsTotal, dataAds) {
 
@@ -110,6 +106,10 @@
   pinMain.addEventListener('keydown', function (evt) {
     if (evt.key === 'Enter') {
       window.unlockPage(map, adForm);
+
+      window.load(function (data) {
+        window.addAds(data.length, data);
+      }, window.getError); // в случае ошибки будте выводиться текст под картой (в ТЗ не нашел как правильно это обработать)
     }
   });
 
@@ -136,6 +136,10 @@
 
     if (evt.button === 0) {
       window.unlockPage(map, adForm);
+
+      window.load(function (data) {
+        window.addAds(data.length, data);
+      }, window.getError); // в случае ошибки будте выводиться текст под картой (в ТЗ не нашел как правильно это обработать)
 
       var startCoords = {
         x: evt.clientX,
