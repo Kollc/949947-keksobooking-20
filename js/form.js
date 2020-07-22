@@ -23,14 +23,6 @@
   var addressInput = document.querySelector('#address');
   var formReset = document.querySelector('.ad-form__reset');
 
-  document.querySelectorAll('fieldset').forEach(function (item) { // делаем элеметы формы не активными
-    item.setAttribute('disabled', 'true');
-  });
-
-  document.querySelectorAll('.map__filters').forEach(function (item) { // делаем элеметы формы не активными
-    item.setAttribute('disabled', 'true');
-  });
-
   addressInput.setAttribute('readonly', 'true'); // добавлет к полю адрес возможность только чтения
 
   // функция проверят соответствие кол-ва комнат и кол-ва гостей (в данном случае)

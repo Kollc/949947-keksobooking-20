@@ -6,16 +6,27 @@
   window.unlockPage = function (mapElem, adFormElem) {
     mapElem.classList.remove('map--faded');
     adFormElem.classList.remove('ad-form--disabled');
-    document.querySelectorAll('fieldset').disabled = false; // делаем элеметы формы активными
-    document.querySelectorAll('map__filters').disabled = false; // делаем элеметы формы активными
+    document.querySelectorAll('fieldset').forEach(function (item) { // делаем элеметы формы не активными
+      item.removeAttribute('disabled', 'true');
+    });
+
+    document.querySelectorAll('.map__filters').forEach(function (item) { // делаем элеметы формы не активными
+      item.removeAttribute('disabled', 'true');
+    });
   };
 
   // функция , которая блокировывает страницу
   window.lockPage = function (mapElem, adFormElem) {
     mapElem.classList.add('map--faded');
     adFormElem.classList.add('ad-form--disabled');
-    document.querySelectorAll('fieldset').disabled = true; // делаем элеметы формы неактивными
-    document.querySelectorAll('map__filters').disabled = true; // делаем элеметы формы неактивными
+
+    document.querySelectorAll('fieldset').forEach(function (item) { // делаем элеметы формы не активными
+      item.setAttribute('disabled', 'true');
+    });
+
+    document.querySelectorAll('.map__filters').forEach(function (item) { // делаем элеметы формы не активными
+      item.setAttribute('disabled', 'true');
+    });
   };
 
   // Функция проверяет соответстиве элемента в объекте массива и возвращает русифицированную версию (пришлось написать вот это, тк ассоциативные массивы только с ES6)
