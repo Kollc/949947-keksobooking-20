@@ -1,20 +1,24 @@
 'use strict';
 
 (function () {
-  var HEIGHT_MARK = 70;
-  var WIDTH_MARK = 50; // примерные значения обычных меток
-
   var mapContainer = document.querySelector('.map__filters-container');
   var mapPins = document.querySelector('.map__pins'); // блок с картой, куда нужно добавить объявления
   var map = document.querySelector('.map');
   var adForm = document.querySelector('.ad-form');
   var pinMain = document.querySelector('.map__pin--main');
   var addressInput = document.querySelector('#address');
+  var typeFilter = document.querySelector('#housing-type');
+  var infoAds;
 
   window.lockPage(map, adForm);
 
   // Функция добавляет метки объявлений в DOM
-  window.addAds = function (adsTotal, dataAds) {
+  window.addAds = function (dataLenght, dataAds) {
+    if (infoAds === undefined) {
+      infoAds = dataAds;
+    }
+
+    var countAds = dataLenght <= MAX_COUNT_ADS ? dataLenght : MAX_COUNT_ADS;
 
     var fragmentLabel = document.createDocumentFragment();
     var fragmentCard = document.createDocumentFragment();
@@ -22,7 +26,7 @@
     var templateLabel = document.querySelector('#pin').content.querySelector('.map__pin'); // получаем шаблон метки из верстки
     var templateCard = document.querySelector('#card').content.querySelector('.map__card'); // получаем шаблон каточки объяевления из верстки
 
-    for (var i = 0; i < adsTotal; i++) {
+    for (var i = 0; i < countAds; i++) {
       var elemLabel = templateLabel.cloneNode(true);
       elemLabel.querySelector('img').src = dataAds[i].author.avatar;
       elemLabel.querySelector('img').alt = dataAds[i].offer.title;
@@ -57,6 +61,28 @@
     var allCards = map.querySelectorAll('.map__card'); // получаем все карточки
     var allPins = mapPins.querySelectorAll('button:not(.map__pin--main)'); // получаем все метки на карте
 
+    // обработчик события выбора типа жилья на карте
+    typeFilter.addEventListener('change', function () {
+      if (typeFilter.value === 'any') {
+        window.addAds(infoAds.length, infoAds);
+      } else {
+        var filterAds = infoAds.slice().filter(function (ad) {
+          return ad.offer.type === typeFilter.value;
+        });
+
+        allCards.forEach(function (card) { // удаляем все карточки объвлеия
+          card.remove();
+        });
+
+        allPins.forEach(function (pin) { // удаляем из DOM все метки
+          pin.remove();
+        });
+
+        window.addAds(filterAds.length, filterAds);
+      }
+    });
+
+    // скрытия и показ меток и объявлений
     allPins.forEach(function (pin, indexPin) {
       pin.addEventListener('click', function (evt) {
         allCards.forEach(function (card) {
@@ -106,15 +132,18 @@
   pinMain.addEventListener('keydown', function (evt) {
     if (evt.key === 'Enter') {
       window.unlockPage(map, adForm);
-
       window.load(function (data) {
-        window.addAds(data.length, data);
+        window.addAds(data.length, infoAds);
       }, window.getError); // в случае ошибки будте выводиться текст под картой (в ТЗ не нашел как правильно это обработать)
     }
   });
 
   var HEIGHT_MAIN_MARK = 85; // примерные значения главной метки
   var WIDTH_MAIN_MARK = 65;
+
+  var HEIGHT_MARK = 70;
+  var WIDTH_MARK = 50; // примерные значения обычных меток
+  var MAX_COUNT_ADS = 5;
 
   var BORDER_TOP = 130 - HEIGHT_MAIN_MARK / 2; // примерные значения главной метки
   var BORDER_BOTTOM = 630;
